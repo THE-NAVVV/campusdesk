@@ -8,7 +8,7 @@ async function apiRequest(path, { method = "GET", body, auth = true } = {}) {
 
   const res = await fetch(`${API_BASE}${path}`, {
     method,
-    headers,
+    headers, 
     body: body ? JSON.stringify(body) : undefined,
   });
 

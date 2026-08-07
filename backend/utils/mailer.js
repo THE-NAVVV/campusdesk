@@ -23,6 +23,7 @@ export async function sendMail({ to, subject, text }) {
     return info;
   } catch (err) {
     // Dev fallback: agar SMTP creds nahi hain toh console pe hi print kardo
+    console.error("SMTP ERROR:", err.message); 
     console.log(`[DEV MAIL FALLBACK] To: ${to} | Subject: ${subject} | ${text}`);
   }
 }
