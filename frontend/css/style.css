@@ -1,0 +1,426 @@
+/* ============ frontend/css/style.css (COMPLETE) ============ */
+
+:root {
+  --bg: #f4efe4;
+  --bg-card: #ffffff;
+  --green: #4a5d3a;
+  --orange: #b0552f;
+  --text: #2b2b26;
+  --text-muted: #6f6b5e;
+  --border: #e2dbc9;
+  --danger: #b0552f;
+  --success: #4a5d3a;
+  --radius: 10px;
+  --shadow: 0 2px 10px rgba(0,0,0,0.06);
+  --font: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+/* ---------- Dark theme ---------- */
+:root[data-theme="dark"] {
+  --bg: #1c1e1a;
+  --bg-card: #262920;
+  --green: #7fa06a;
+  --orange: #d97a4e;
+  --text: #ece8dc;
+  --text-muted: #a3a08f;
+  --border: #3a3d33;
+  --danger: #e08a5e;
+  --success: #7fa06a;
+  --shadow: 0 2px 10px rgba(0,0,0,0.35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* ---------- Theme toggle button ---------- */
+.theme-toggle-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-family: var(--font);
+  cursor: pointer;
+  margin-left: 16px;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.theme-toggle-btn:hover { background: var(--border); }
+.theme-toggle-btn:active { transform: scale(0.96); }
+
+/* ---------- Campus background (applied on all app pages) ---------- */
+body.campus-bg {
+  position: relative;
+}
+body.campus-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(180deg, rgba(244,239,228,0.88) 0%, rgba(244,239,228,0.80) 40%, rgba(244,239,228,0.90) 100%),
+    url("assets/lnmiit-campus.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  transition: background-image 0.25s ease;
+}
+:root[data-theme="dark"] body.campus-bg::before {
+  background-image:
+    linear-gradient(180deg, rgba(20,22,17,0.90) 0%, rgba(20,22,17,0.82) 40%, rgba(20,22,17,0.92) 100%),
+    url("assets/lnmiit-campus.jpg");
+}
+
+/* Glassmorphism: let the campus photo show through cards */
+body.campus-bg .card,
+body.campus-bg .navbar,
+body.campus-bg .resource-card,
+body.campus-bg .booking-card,
+body.campus-bg .auth-card {
+  background: rgba(255, 253, 249, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+body.campus-bg .tab,
+body.campus-bg .pagination button {
+  background: rgba(255, 253, 249, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+:root[data-theme="dark"] body.campus-bg .card,
+:root[data-theme="dark"] body.campus-bg .navbar,
+:root[data-theme="dark"] body.campus-bg .resource-card,
+:root[data-theme="dark"] body.campus-bg .booking-card,
+:root[data-theme="dark"] body.campus-bg .auth-card {
+  background: rgba(38, 41, 32, 0.82);
+}
+:root[data-theme="dark"] body.campus-bg .tab,
+:root[data-theme="dark"] body.campus-bg .pagination button {
+  background: rgba(38, 41, 32, 0.85);
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.navbar .logo { font-weight: 600; color: var(--green); font-size: 1.2rem; }
+.navbar a {
+  text-decoration: none;
+  color: var(--text-muted);
+  margin-left: 20px;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+.navbar a:hover, .navbar a.active { color: var(--orange); }
+
+/* ---------- Layout ---------- */
+.container { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--green); color: #fff; }
+.btn-primary:hover:not(:disabled) { opacity: 0.9; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.btn-danger { background: var(--danger); color: #fff; }
+
+/* ---------- Inputs ---------- */
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  background: #fffdf9;
+  color: var(--text);
+}
+.input:focus { outline: none; border-color: var(--orange); }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 0.85rem; margin-bottom: 6px; color: var(--text-muted); }
+.field .error { color: var(--danger); font-size: 0.78rem; margin-top: 4px; }
+
+/* ---------- OTP boxes ---------- */
+.otp-boxes { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+.otp-boxes input {
+  width: 44px; height: 52px;
+  text-align: center;
+  font-size: 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fffdf9;
+}
+.otp-boxes input:focus { border-color: var(--orange); outline: none; }
+
+/* ---------- Badges / status ---------- */
+.badge { padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+.badge-confirmed { background: #e7ede2; color: var(--green); }
+.badge-cancelled { background: #f3e3dc; color: var(--orange); }
+.badge-completed { background: #eee9db; color: var(--text-muted); }
+
+/* ---------- Loading / empty / error states ---------- */
+.state-msg { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9rem; }
+.spinner {
+  width: 22px; height: 22px;
+  border: 3px solid var(--border);
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Background wire canvas ---------- */
+#bgChip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---------- Auth page ---------- */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+.auth-card { width: 100%; max-width: 380px; position: relative; z-index: 1; }
+.auth-title { color: var(--green); font-size: 1.6rem; margin-bottom: 4px; text-align: center; }
+.auth-subtitle { color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-bottom: 20px; }
+.optional { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--orange);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px 0;
+}
+.btn-link:disabled { color: var(--text-muted); cursor: not-allowed; }
+
+.resend-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 0.8rem;
+}
+.text-muted { color: var(--text-muted); }
+
+/* ---------- Filters / search ---------- */
+.filters-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Resource grid ---------- */
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.resource-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.resource-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.09); }
+
+.resource-card h3 { color: var(--green); font-size: 1.05rem; margin-bottom: 4px; }
+.resource-card .meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px; }
+.resource-card p { font-size: 0.85rem; color: var(--text); margin-bottom: 10px; }
+.resource-card .category-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #eef1e9;
+  color: var(--green);
+  text-transform: capitalize;
+}
+
+/* ---------- Pagination ---------- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 28px;
+}
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.pagination button.active { background: var(--green); color: #fff; border-color: var(--green); }
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- Timeline (resource detail page) ---------- */
+.timeline {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.slot {
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  min-width: 64px;
+  text-align: center;
+  transition: transform 0.12s ease, background 0.15s ease;
+  background: #eef1e9;
+  color: var(--green);
+}
+.slot:hover { transform: translateY(-2px); }
+.slot.booked { background: #f3e3dc; color: var(--orange); cursor: not-allowed; }
+.slot.mine { background: var(--green); color: #fff; cursor: not-allowed; }
+
+.timeline-legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+.dot.free { background: #eef1e9; border: 1px solid var(--green); }
+.dot.booked { background: #f3e3dc; border: 1px solid var(--orange); }
+.dot.mine { background: var(--green); }
+
+.resource-info-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+.resource-info-header h2 { color: var(--green); }
+.resource-info-header .meta { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+
+/* ---------- Tabs (my-bookings page) ---------- */
+.tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.tab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.18s ease;
+}
+.tab.active { background: var(--green); color: #fff; border-color: var(--green); }
+
+/* ---------- Booking cards ---------- */
+.booking-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: var(--shadow);
+}
+.booking-card h4 { color: var(--green); font-size: 0.95rem; }
+.booking-card .meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+
+/* ---------- Admin page ---------- */
+.resource-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.admin-resource-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.admin-resource-row:last-child { border-bottom: none; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 500px) {
+  .navbar { padding: 12px 16px; flex-direction: column; gap: 8px; }
+  .container { padding: 20px 12px; }
+  .filters-row { flex-direction: column; }
+  .filters-row .input { max-width: 100% !important; }
+  .resource-form-grid { grid-template-columns: 1fr; }
+}
+/* ---------- Dark theme fine-tuning for hardcoded-light elements ---------- */
+:root[data-theme="dark"] .input,
+:root[data-theme="dark"] .otp-boxes input {
+  background: #20231b;
+  color: var(--text);
+  border-color: var(--border);
+}
+:root[data-theme="dark"] .badge-confirmed { background: #2e3a26; color: var(--green); }
+:root[data-theme="dark"] .badge-cancelled { background: #3d2c22; color: var(--orange); }
+:root[data-theme="dark"] .badge-completed { background: #33352a; color: var(--text-muted); }
+:root[data-theme="dark"] .slot { background: #2e3a26; color: var(--green); }
+:root[data-theme="dark"] .slot.booked { background: #3d2c22; color: var(--orange); }
+:root[data-theme="dark"] .dot.free { background: #2e3a26; }
+:root[data-theme="dark"] .dot.booked { background: #3d2c22; }
+:root[data-theme="dark"] .resource-card .category-tag { background: #2e3a26; color: var(--green); }
+:root[data-theme="dark"] .pagination button { background: var(--bg-card); }

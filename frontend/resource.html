@@ -1,0 +1,76 @@
+<!-- ============ frontend/resource.html ============ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusDesk — Resource</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="campus-bg">
+
+  <nav class="navbar">
+    <div class="logo">CampusDesk</div>
+    <div>
+      <a href="resources.html" class="active">Resources</a>
+      <a href="my-bookings.html">My Bookings</a>
+      <a href="admin.html" id="adminLink" style="display:none">Admin</a>
+      <button id="themeToggleBtn" class="theme-toggle-btn" type="button"></button>
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div id="resourceInfo" class="card" style="margin-bottom:20px"></div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="field" style="margin-bottom:0">
+        <label for="datePicker">Select date</label>
+        <input class="input" type="date" id="datePicker" style="max-width:220px" />
+      </div>
+      <div id="timeline" class="timeline"></div>
+      <div id="timelineState" class="state-msg" style="display:none"></div>
+      <div class="timeline-legend">
+        <span><i class="dot free"></i> Free</span>
+        <span><i class="dot booked"></i> Booked</span>
+        <span><i class="dot mine"></i> Your booking</span>
+      </div>
+    </div>
+
+    <div class="card" id="bookingFormCard">
+      <h3 style="margin-bottom:14px; color:var(--green)">Book this resource</h3>
+      <form id="bookingForm">
+        <div class="field">
+          <label for="startTime">Start time</label>
+          <input class="input" type="time" id="startTime" required />
+          <div class="error" id="startError"></div>
+        </div>
+        <div class="field">
+          <label for="endTime">End time</label>
+          <input class="input" type="time" id="endTime" required />
+          <div class="error" id="endError"></div>
+        </div>
+        <div class="field">
+          <label for="purpose">Purpose</label>
+          <input class="input" type="text" id="purpose" placeholder="e.g. Club meeting" />
+        </div>
+        <div class="field" style="display:flex; align-items:center; gap:8px; margin-bottom:8px">
+          <input type="checkbox" id="recurringCheck" style="width:auto" />
+          <label for="recurringCheck" style="margin-bottom:0">Repeat weekly</label>
+        </div>
+        <div class="field" id="recurringWeeksField" style="display:none">
+          <label for="recurringWeeks">Number of weeks (2–12)</label>
+          <input class="input" type="number" id="recurringWeeks" min="2" max="12" value="4" style="max-width:120px" />
+        </div>
+        <div class="error" id="formError" style="margin-bottom:10px"></div>
+        <button class="btn btn-primary" type="submit" id="bookBtn">Book Slot</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/bookings.js"></script>
+</body>
+</html>

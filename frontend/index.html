@@ -1,0 +1,75 @@
+<!-- ============ frontend/index.html ============ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusDesk — Login</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="campus-bg">
+
+  <canvas id="bgChip"></canvas>
+
+  <button id="themeToggleBtn" class="theme-toggle-btn" type="button" style="position:fixed; top:20px; right:20px; z-index:5"></button>
+
+  <div class="auth-wrapper">
+    <div class="card auth-card" id="otpCard">
+      <h1 class="auth-title">CampusDesk</h1>
+      <p class="auth-subtitle">Book campus resources, hassle-free.</p>
+
+      <!-- STEP 1: Email -->
+      <form id="emailStep">
+        <div class="field">
+          <label for="name">Name <span class="optional">(only for first-time signup)</span></label>
+          <input class="input" type="text" id="name" placeholder="Nav Vardhan Singh" />
+        </div>
+        <div class="field">
+          <label for="email">College Email</label>
+          <input class="input" type="email" id="email" placeholder="25dec041@lnmiit.ac.in" required />
+          <div class="error" id="emailError"></div>
+        </div>
+        <button class="btn btn-primary" style="width:100%" type="submit" id="sendOtpBtn">
+          Send OTP
+        </button>
+      </form>
+
+      <!-- STEP 2: OTP (hidden initially) -->
+      <form id="otpStep" style="display:none">
+        <p class="auth-subtitle" style="margin-bottom:4px">
+          OTP sent to <strong id="otpEmailDisplay"></strong>
+        </p>
+        <div class="otp-boxes">
+          <input maxlength="1" type="text" inputmode="numeric" />
+          <input maxlength="1" type="text" inputmode="numeric" />
+          <input maxlength="1" type="text" inputmode="numeric" />
+          <input maxlength="1" type="text" inputmode="numeric" />
+          <input maxlength="1" type="text" inputmode="numeric" />
+          <input maxlength="1" type="text" inputmode="numeric" />
+        </div>
+        <div class="error" id="otpError" style="text-align:center; margin-bottom:12px"></div>
+
+        <button class="btn btn-primary" style="width:100%" type="submit" id="verifyBtn">
+          Verify & Login
+        </button>
+
+        <div class="resend-row">
+          <span id="resendTimer" class="text-muted"></span>
+          <button type="button" class="btn-link" id="resendBtn" disabled>Resend OTP</button>
+        </div>
+
+        <button type="button" class="btn-link" id="backBtn">← Change email</button>
+      </form>
+
+      <div id="formState" class="state-msg" style="display:none"></div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/card-wire-animation.js"></script>
+</body>
+</html>

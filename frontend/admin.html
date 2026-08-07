@@ -1,0 +1,75 @@
+<!-- ============ frontend/admin.html ============ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusDesk — Admin</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="campus-bg">
+
+  <nav class="navbar">
+    <div class="logo">CampusDesk</div>
+    <div>
+      <a href="resources.html">Resources</a>
+      <a href="my-bookings.html">My Bookings</a>
+      <a href="admin.html" class="active">Admin</a>
+      <button id="themeToggleBtn" class="theme-toggle-btn" type="button"></button>
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Add / manage resources -->
+    <div class="card" style="margin-bottom:24px">
+      <h3 style="color:var(--green); margin-bottom:14px">Add New Resource</h3>
+      <form id="resourceForm" class="resource-form-grid">
+        <div class="field"><label>Name</label><input class="input" id="rName" required /></div>
+        <div class="field"><label>Location</label><input class="input" id="rLocation" /></div>
+        <div class="field">
+          <label>Category</label>
+          <select class="input" id="rCategory" required>
+            <option value="hall">Hall</option>
+            <option value="room">Room</option>
+            <option value="equipment">Equipment</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Open time</label><input class="input" type="time" id="rOpen" required /></div>
+        <div class="field"><label>Close time</label><input class="input" type="time" id="rClose" required /></div>
+        <div class="field" style="grid-column:1/-1"><label>Description</label><input class="input" id="rDesc" /></div>
+        <div class="error" id="resourceFormError" style="grid-column:1/-1"></div>
+        <button class="btn btn-primary" type="submit" id="addResourceBtn" style="grid-column:1/-1">Add Resource</button>
+      </form>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <h3 style="color:var(--green); margin-bottom:14px">Manage Resources</h3>
+      <div id="adminResourceList"></div>
+    </div>
+
+    <!-- All bookings -->
+    <div class="card">
+      <h3 style="color:var(--green); margin-bottom:14px">All Bookings</h3>
+      <div class="filters-row">
+        <select class="input" id="filterStatus" style="max-width:160px">
+          <option value="">All statuses</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="completed">Completed</option>
+        </select>
+        <input class="input" type="date" id="filterDate" style="max-width:180px" />
+      </div>
+      <div id="allBookingsList" class="bookings-list"></div>
+      <div id="adminBookingsState" class="state-msg" style="display:none"></div>
+      <div class="pagination" id="adminPagination"></div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

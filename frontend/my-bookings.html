@@ -1,0 +1,42 @@
+<!-- ============ frontend/my-bookings.html ============ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusDesk — My Bookings</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="campus-bg">
+
+  <nav class="navbar">
+    <div class="logo">CampusDesk</div>
+    <div>
+      <a href="resources.html">Resources</a>
+      <a href="my-bookings.html" class="active">My Bookings</a>
+      <a href="admin.html" id="adminLink" style="display:none">Admin</a>
+      <button id="themeToggleBtn" class="theme-toggle-btn" type="button"></button>
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="tabs" id="statusTabs">
+      <button class="tab active" data-status="">All</button>
+      <button class="tab" data-status="confirmed">Confirmed</button>
+      <button class="tab" data-status="cancelled">Cancelled</button>
+      <button class="tab" data-status="completed">Completed</button>
+      <button class="tab" data-status="waitlist" id="waitlistTab">Waitlist</button>
+    </div>
+
+    <div id="bookingsList" class="bookings-list"></div>
+    <div id="stateMsg" class="state-msg" style="display:none"></div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/my-bookings.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!-- ============ frontend/resources.html ============ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusDesk — Resources</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="campus-bg">
+
+  <nav class="navbar">
+    <div class="logo">CampusDesk</div>
+    <div>
+      <a href="resources.html" class="active">Resources</a>
+      <a href="my-bookings.html">My Bookings</a>
+      <a href="admin.html" id="adminLink" style="display:none">Admin</a>
+      <button id="themeToggleBtn" class="theme-toggle-btn" type="button"></button>
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="filters-row">
+      <input class="input" type="text" id="searchInput" placeholder="Search resources..." style="max-width:280px" />
+      <select class="input" id="categoryFilter" style="max-width:160px">
+        <option value="">All categories</option>
+        <option value="hall">Hall</option>
+        <option value="room">Room</option>
+        <option value="equipment">Equipment</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div id="resourceGrid" class="resource-grid"></div>
+    <div id="stateMsg" class="state-msg" style="display:none"></div>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/resources.js"></script>
+</body>
+</html>
