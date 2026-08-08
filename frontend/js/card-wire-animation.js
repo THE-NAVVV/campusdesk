@@ -1,28 +1,26 @@
-// ===== Background: PCB signal traces pulsing into the login/OTP card from all 4 sides =====
-// Adapted from chip-animation.js: chip box + label removed, target is the card's own
-// bounding box, and instead of a one-time build it repeats in a loop every ~5 seconds.
+
 (function(){
   const canvas = document.getElementById('bgChip');
-  const card = document.getElementById('otpCard'); // <-- give your login/OTP card this id
+  const card = document.getElementById('otpCard'); 
   if(!canvas || !card) return;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduceMotion) return;
 
   const ctx = canvas.getContext('2d');
   let cw, ch;
-  let cardBox; // {x0,y0,x1,y1} of the card, in canvas coords
+  let cardBox; 
   let traces = [];
   let pins = [];
   const PINS_PER_SIDE = 5;
   const FADE_LEN = 90;
   const DIM_ALPHA = 0.10;
   const LINE_W = 1.4;
-  const COLOR = '85,101,79'; // sage, matches site theme
+  const COLOR = '85,101,79'; 
 
-  const CYCLE_MS = 5000;   // full loop duration: one pulse every 5s
-  const BUILD_FRAMES = 90; // wires shooting in (longer travel now, so slower/smoother)
-  const HOLD_FRAMES = 30;  // sit lit at the card edge
-  const FADE_FRAMES = 30;  // fade back out before next cycle
+  const CYCLE_MS = 5000;   
+  const BUILD_FRAMES = 90; 
+  const HOLD_FRAMES = 30;  
+  const FADE_FRAMES = 30;  
   let frame = 0;
   let phase = 'building';
 
@@ -106,8 +104,7 @@
     const shuffled = pins.slice().sort(function(){ return Math.random()-0.5; });
 
     shuffled.forEach(function(pin){
-      // spawn far out at the canvas edge on the same side as the pin, so the
-      // trace travels a long visible distance in before reaching the card
+      
       let sx, sy;
       if(pin.side === 'top'){ sx = Math.random()*cw; sy = 0; }
       else if(pin.side === 'bottom'){ sx = Math.random()*cw; sy = ch; }
@@ -195,7 +192,7 @@
       if(phase === 'building'){
         head = Math.min(localFrame * tr.speed, tr.total);
       } else {
-        head = tr.total; // fully drawn during hold + fade
+        head = tr.total; 
       }
       drawSegment(tr, head, localAlpha);
     });
@@ -223,7 +220,7 @@
     } else if(phase === 'hold' && frame >= BUILD_FRAMES + HOLD_FRAMES){
       phase = 'fading';
     } else if(phase === 'fading' && frame >= BUILD_FRAMES + HOLD_FRAMES + FADE_FRAMES){
-      // restart the loop: re-measure in case card moved (e.g. resize/scroll) and rebuild
+      
       measureCard();
       buildTraces();
       frame = 0;

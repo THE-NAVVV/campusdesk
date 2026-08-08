@@ -18,7 +18,7 @@ router.post("/send-otp", checkOtpRateLimit, async (req, res) => {
   const { email, name } = req.body;
   if (!email) return res.status(400).json({ error: { message: "Email is required" } });
 
-  // agar user exist nahi karta aur naya signup hai, name chahiye hoga
+  
   const existingUser = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
   if (!existingUser && !name) {
     return res.status(400).json({ error: { message: "Name is required for signup" } });
@@ -33,7 +33,7 @@ router.post("/send-otp", checkOtpRateLimit, async (req, res) => {
     expiresAt
   );
 
-  console.log(`[OTP] ${email} -> ${code}`); // dev visibility
+  console.log(`[OTP] ${email} -> ${code}`); 
 
   await sendMail({
     to: email,

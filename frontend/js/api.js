@@ -1,5 +1,5 @@
 // ============ frontend/js/api.js ============
-const API_BASE = "https://campusdesk-production.up.railway.app/api"; // deploy karte time yahi URL change karna
+const API_BASE = "https://campusdesk-production.up.railway.app/api"; 
 
 async function apiRequest(path, { method = "GET", body, auth = true } = {}) {
   const headers = { "Content-Type": "application/json" };

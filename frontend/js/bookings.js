@@ -52,8 +52,7 @@ function minutesToHHMM(min) {
 
 async function loadResourceInfo() {
   try {
-    // reuse list endpoint with search since there's no GET /:id in spec;
-    // simplest: fetch all and find (fine at this scale) — or add filter
+   
     const data = await apiRequest(`/resources?limit=100`);
     resource = data.data.find((r) => String(r.id) === resourceId);
     if (!resource) {

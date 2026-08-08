@@ -3,12 +3,11 @@ import cron from "node-cron";
 import db from "../db.js";
 import { sendMail } from "../utils/mailer.js";
 
-// runs every minute
 cron.schedule("* * * * *", async () => {
   const now = new Date();
   const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
 
-  // 1) send reminder emails for bookings starting in ~the next hour, not sent yet
+  
   const upcoming = db
     .prepare(
       `SELECT b.*, u.email as userEmail, u.name as userName, r.name as resourceName
@@ -31,7 +30,7 @@ cron.schedule("* * * * *", async () => {
     db.prepare(`UPDATE bookings SET reminderSent = 1 WHERE id = ?`).run(b.id);
   }
 
-  // 2) mark past confirmed bookings as completed
+  
   db.prepare(
     `UPDATE bookings SET status = 'completed'
      WHERE status = 'confirmed' AND endTime <= ?`

@@ -1,4 +1,4 @@
-/* ============ frontend/css/style.css (COMPLETE) ============ */
+/* ============ frontend/css/style.css  ============ */
 
 :root {
   --bg: #f4efe4;
@@ -58,7 +58,7 @@ body {
 .theme-toggle-btn:hover { background: var(--border); }
 .theme-toggle-btn:active { transform: scale(0.96); }
 
-/* ---------- Campus background (applied on all app pages) ---------- */
+/* ---------- Campus background  ---------- */
 body.campus-bg {
   position: relative;
 }
@@ -82,7 +82,6 @@ body.campus-bg::before {
     url("assets/lnmiit-campus.jpg");
 }
 
-/* Glassmorphism: let the campus photo show through cards */
 body.campus-bg .card,
 body.campus-bg .navbar,
 body.campus-bg .resource-card,

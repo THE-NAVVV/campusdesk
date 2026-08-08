@@ -1,6 +1,5 @@
 // ============ frontend/js/theme.js ============
-// Dark/light theme toggle with persisted preference (localStorage).
-// Applied before other scripts run so there's no flash of wrong theme.
+
 
 (function () {
   const STORAGE_KEY = "campusdesk-theme";
@@ -8,7 +7,7 @@
   function getPreferredTheme() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === "dark" || saved === "light") return saved;
-    // fall back to OS preference on first visit
+    
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
 
@@ -30,10 +29,10 @@
     applyTheme(current === "dark" ? "light" : "dark");
   }
 
-  // apply immediately (before DOM paints body) to avoid flash
+  
   applyTheme(getPreferredTheme());
 
-  // wire up the button once DOM is ready
+  
   document.addEventListener("DOMContentLoaded", () => {
     const btn = document.getElementById("themeToggleBtn");
     if (btn) {

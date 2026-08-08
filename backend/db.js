@@ -65,13 +65,11 @@ CREATE INDEX IF NOT EXISTS idx_waitlist_resource_time
   ON waitlist (resourceId, startTime, endTime, status);
 `);
 
-// ---- Migration: add recurringGroupId to bookings if the table already
-// existed from before this column was introduced (CREATE TABLE IF NOT EXISTS
-// won't add new columns to an existing table) ----
+
 try {
   db.exec(`ALTER TABLE bookings ADD COLUMN recurringGroupId TEXT`);
 } catch (e) {
-  // column already exists — ignore
+  
 }
 
 export default db;

@@ -11,10 +11,7 @@ function toMinutes(hhmm) {
   return h * 60 + m;
 }
 
-// Validates a single occurrence (resource hours, duration) and checks for a
-// clash. Returns { error: { status, body } } on failure, or { ok: true }.
-// Does NOT check "must be in the future" — callers decide whether that
-// applies (e.g. not for later weeks of a recurring series relative to now).
+
 function validateOccurrence(resource, startTime, endTime) {
   const start = new Date(startTime);
   const end = new Date(endTime);
@@ -59,8 +56,7 @@ function validateOccurrence(resource, startTime, endTime) {
   return { ok: true };
 }
 
-// Promotes the earliest waiting waitlist entry (if any) that overlaps the
-// given freed-up slot into a real confirmed booking, and emails the user.
+
 async function promoteWaitlist(resourceId, startTime, endTime) {
   const entry = db
     .prepare(
@@ -73,9 +69,7 @@ async function promoteWaitlist(resourceId, startTime, endTime) {
 
   if (!entry) return null;
 
-  // re-check no clash exists for the waitlisted slot before promoting
-  // (it's possible a different, non-overlapping-with-the-cancelled-one
-  // booking already occupies part of it)
+  
   const stillClashes = db
     .prepare(
       `SELECT * FROM bookings WHERE resourceId = ? AND status = 'confirmed' AND startTime < ? AND endTime > ?`
@@ -188,9 +182,7 @@ router.post("/", requireAuth, (req, res) => {
     });
   }
 
-  // insert — better-sqlite3 is synchronous+single-connection so this whole
-  // handler runs atomically relative to other requests; no separate
-  // transaction/lock needed for the race condition (see DESIGN.md)
+  
   const info = db
     .prepare(
       `INSERT INTO bookings (userId, resourceId, startTime, endTime, purpose)
@@ -202,7 +194,7 @@ router.post("/", requireAuth, (req, res) => {
   res.status(201).json(booking);
 });
 
-// GET /api/bookings/me?status=&page=&limit=
+
 router.get("/me", requireAuth, (req, res) => {
   const { status = "", page = 1, limit = 10 } = req.query;
   const p = Math.max(1, Number(page));
@@ -233,7 +225,7 @@ router.get("/me", requireAuth, (req, res) => {
   res.json({ data, page: p, limit: l, total });
 });
 
-// PATCH /api/bookings/:id/cancel
+
 router.patch("/:id/cancel", requireAuth, async (req, res) => {
   const booking = db.prepare(`SELECT * FROM bookings WHERE id = ?`).get(req.params.id);
   if (!booking) return res.status(404).json({ error: { message: "Booking not found" } });
@@ -254,16 +246,13 @@ router.patch("/:id/cancel", requireAuth, async (req, res) => {
 
   db.prepare(`UPDATE bookings SET status = 'cancelled' WHERE id = ?`).run(req.params.id);
 
-  // this slot is free now — auto-promote the earliest matching waitlist entry, if any
+  
   const promoted = await promoteWaitlist(booking.resourceId, booking.startTime, booking.endTime);
 
   res.json({ message: "Booking cancelled", promoted: promoted ? true : false });
 });
 
-// POST /api/bookings/recurring
-// Body: { resourceId, startTime, endTime, purpose, weeks }
-// Creates `weeks` weekly occurrences starting from startTime/endTime.
-// Atomic: if ANY occurrence is invalid or clashes, NONE are created.
+
 router.post("/recurring", requireAuth, (req, res) => {
   const { resourceId, startTime, endTime, purpose, weeks } = req.body;
   const errors = {};
@@ -285,7 +274,7 @@ router.post("/recurring", requireAuth, (req, res) => {
     return res.status(400).json({ error: { fields: { startTime: "Start time must be in the future" } } });
   }
 
-  // build all occurrences (same time-of-day, +7 days each week)
+  
   const occurrences = [];
   for (let i = 0; i < numWeeks; i++) {
     const s = new Date(startTime);
@@ -295,7 +284,7 @@ router.post("/recurring", requireAuth, (req, res) => {
     occurrences.push({ startTime: s.toISOString().slice(0, 19), endTime: e.toISOString().slice(0, 19) });
   }
 
-  // validate every occurrence FIRST (no partial writes)
+
   for (const occ of occurrences) {
     const result = validateOccurrence(resource, occ.startTime, occ.endTime);
     if (result.error) {
@@ -306,16 +295,14 @@ router.post("/recurring", requireAuth, (req, res) => {
     }
   }
 
-  // per-resource 2-upcoming-bookings limit — recurring series counts toward it too
+  
   const upcomingCount = db
     .prepare(
       `SELECT COUNT(*) as c FROM bookings WHERE userId = ? AND resourceId = ? AND status = 'confirmed' AND startTime > datetime('now')`
     )
     .get(req.user.id, resourceId).c;
   if (upcomingCount + numWeeks > 2 && false) {
-    // NOTE: the normal 2-booking cap would make recurring series almost
-    // unusable (a series IS multiple bookings by design), so it's
-    // intentionally not applied here. Left visible for future tuning.
+    
   }
 
   // all validated — insert atomically in a transaction
@@ -346,8 +333,7 @@ router.post("/recurring", requireAuth, (req, res) => {
   res.status(201).json({ recurringGroupId: groupId, count: created.length, data: created });
 });
 
-// POST /api/bookings/:resourceId/waitlist
-// Join the waitlist for a resource/time slot that's currently taken.
+
 router.post("/:resourceId/waitlist", requireAuth, (req, res) => {
   const { startTime, endTime, purpose } = req.body;
   const resourceId = req.params.resourceId;
@@ -360,7 +346,7 @@ router.post("/:resourceId/waitlist", requireAuth, (req, res) => {
   const resource = db.prepare(`SELECT * FROM resources WHERE id = ? AND isActive = 1`).get(resourceId);
   if (!resource) return res.status(404).json({ error: { message: "Resource not found" } });
 
-  // only makes sense if the slot is actually currently clashing with a real booking
+  
   const clash = db
     .prepare(
       `SELECT * FROM bookings WHERE resourceId = ? AND status = 'confirmed' AND startTime < ? AND endTime > ?`
@@ -370,7 +356,7 @@ router.post("/:resourceId/waitlist", requireAuth, (req, res) => {
     return res.status(400).json({ error: { message: "This slot is free — book it directly instead of joining a waitlist" } });
   }
 
-  // don't let a user double-join the same slot
+  
   const already = db
     .prepare(
       `SELECT * FROM waitlist WHERE userId = ? AND resourceId = ? AND startTime = ? AND endTime = ? AND status = 'waiting'`
@@ -388,7 +374,7 @@ router.post("/:resourceId/waitlist", requireAuth, (req, res) => {
   res.status(201).json(entry);
 });
 
-// GET /api/bookings/waitlist/me
+
 router.get("/waitlist/me", requireAuth, (req, res) => {
   const data = db
     .prepare(
@@ -400,7 +386,7 @@ router.get("/waitlist/me", requireAuth, (req, res) => {
   res.json({ data });
 });
 
-// DELETE /api/bookings/waitlist/:id — leave a waitlist
+
 router.delete("/waitlist/:id", requireAuth, (req, res) => {
   const entry = db.prepare(`SELECT * FROM waitlist WHERE id = ?`).get(req.params.id);
   if (!entry) return res.status(404).json({ error: { message: "Waitlist entry not found" } });

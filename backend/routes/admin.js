@@ -5,7 +5,7 @@ import { requireAuth, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// GET /api/admin/bookings?resourceId=&status=&date=&page=&limit=
+
 router.get("/bookings", requireAuth, requireAdmin, (req, res) => {
   const { resourceId = "", status = "", date = "", page = 1, limit = 10 } = req.query;
   const p = Math.max(1, Number(page));

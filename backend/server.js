@@ -7,7 +7,7 @@ import authRoutes from "./routes/auth.js";
 import resourceRoutes from "./routes/resources.js";
 import bookingRoutes from "./routes/bookings.js";
 import adminRoutes from "./routes/admin.js";
-import "./cron/reminders.js"; // starts the cron job on boot
+import "./cron/reminders.js"; 
 
 const app = express();
 app.use(cors());
@@ -23,7 +23,7 @@ app.use((req, res) => {
   res.status(404).json({ error: { message: "Route not found" } });
 });
 
-// global error handler (catches anything thrown/rejected in routes)
+
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: { message: "Internal server error" } });
