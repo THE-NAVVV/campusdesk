@@ -14,6 +14,9 @@ Built for the GDG LNMIIT Web Development Recruitment task.
 ## ✨ Features
 
 - Email OTP authentication (no passwords) → JWT sessions
+  - Email-first login flow: you enter your email, the backend checks if
+    you're already registered, and only asks for your name if you're new —
+    returning users go straight from email to OTP.
 - Role-based access: student / admin
 - Resource discovery — paginated, debounced search, category filters
 - Booking with a live availability timeline (click a free slot to book)
@@ -36,9 +39,9 @@ other design decisions.
 | Layer    | Tech |
 |----------|------|
 | Backend  | Node.js, Express |
-| Database | SQLite (`better-sqlite3`, WAL mode) |
+| Database | SQLite (`better-sqlite3`, WAL mode), persisted on a Railway volume |
 | Auth     | Email OTP + JWT (`jsonwebtoken`) |
-| Email    | Nodemailer (console fallback in dev) |
+| Email    | Brevo transactional email HTTP API (console fallback in dev / on failure) |
 | Cron     | `node-cron` |
 | Frontend | Vanilla HTML / CSS / JS |
 | Hosting  | Railway (backend + DB), Netlify (frontend) |
@@ -52,7 +55,7 @@ backend/
   utils/          mailer.js
   cron/           reminders.js
   db.js           schema + migrations
-  seed.js         seeds 1 admin, 2 students, 40+ resources
+  seed.js         seeds resources only (leaves users/bookings untouched)
   server.js
 
 frontend/
@@ -68,8 +71,8 @@ frontend/
 ```bash
 cd backend
 npm install
-cp .env.example .env   # fill in JWT_SECRET, SMTP_* (optional — logs to console if omitted)
-npm run seed            # seeds admin/students/resources
+cp .env.example .env   # fill in JWT_SECRET, BREVO_API_KEY, BREVO_SENDER_EMAIL
+npm run seed            # seeds resources (and an admin user, if none exists)
 npm start                # runs on PORT (default 5000)
 ```
 
@@ -79,14 +82,25 @@ npm start                # runs on PORT (default 5000)
 PORT=5000
 JWT_SECRET=change_me
 JWT_EXPIRES_IN=24h
+
+BREVO_API_KEY=your_brevo_api_key
+BREVO_SENDER_EMAIL=your_verified_sender@example.com
+
+# Optional: absolute path for the SQLite file. On Railway this points at a
+# mounted volume (e.g. /data/campusdesk.db) so data survives restarts/redeploys.
+# If unset, defaults to ./campusdesk.db (fine for local dev).
+DB_PATH=
+
 OTP_EXPIRY_MIN=5
 OTP_MAX_REQUESTS=3
 OTP_WINDOW_MIN=10
-SMTP_HOST=
-SMTP_PORT=
-SMTP_USER=
-SMTP_PASS=
 ```
+
+**Why Brevo instead of raw SMTP:** Railway blocks outbound SMTP ports (25,
+465, 587) on its free/hobby tier, so `nodemailer` over SMTP times out in
+production even with correct credentials. Brevo's HTTP API sends over normal
+HTTPS (443), which isn't blocked, and its free tier (300 emails/day) doesn't
+require a verified domain — just one verified sender email.
 
 ### Frontend
 
@@ -94,20 +108,38 @@ Just open `index.html` via a static server (or Live Server) — it talks to
 `API_BASE` set in `js/api.js`. Update that constant to `http://localhost:5000/api`
 for local backend testing, or leave it pointed at the Railway URL above.
 
-## 🔑 Seeded accounts
+## 🔐 How login works
 
-| Role    | Email               |
-|---------|---------------------|
-| Admin   | admin@lnmiit.ac.in  |
-| Student | nav@lnmiit.ac.in    |
-| Student | priya@lnmiit.ac.in  |
+CampusDesk has no passwords — everything is email OTP + JWT.
 
-OTPs print to the backend console when SMTP isn't configured.
+1. **Enter email** — the frontend calls `GET /api/auth/check-email?email=...`
+   to check if that email is already registered.
+2. **Branch:**
+   - **New email** → a "what's your name?" step appears. Name is only ever
+     asked once, at signup.
+   - **Already registered** → the app skips straight to sending the OTP, no
+     name needed.
+3. **OTP sent** — `POST /api/auth/send-otp` generates a 6-digit code (5 min
+   expiry, single-use), stores it in the `otps` table, and emails it via
+   Brevo. If Brevo fails for any reason, the OTP is also logged to the
+   Railway deploy console as a fallback so login is never fully blocked.
+4. **Verify** — `POST /api/auth/verify-otp` checks the code, marks it used,
+   creates the user row if this is truly their first login (only reachable
+   after step 2's name was collected), and returns a JWT (`{ id, role }`,
+   24h expiry) plus the user object. The frontend stores both in
+   `localStorage` and redirects to the resources page.
+
+There is currently only **one seeded account**: `admin@lnmiit.ac.in` (role:
+`admin`). Every other account is created organically the first time someone
+logs in with a new email — there's no fixed list of "test students" anymore,
+since `seed.js` no longer touches the `users` table if an admin already
+exists (see [DESIGN.md](./DESIGN.md#seeding) for why).
 
 ## 📡 API overview
 
 | Method | Endpoint                          | Auth        |
 |--------|-----------------------------------|-------------|
+| GET    | `/api/auth/check-email`           | —           |
 | POST   | `/api/auth/send-otp`              | —           |
 | POST   | `/api/auth/verify-otp`            | —           |
 | GET    | `/api/resources`                  | student     |
