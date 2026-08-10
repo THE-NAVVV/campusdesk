@@ -1,31 +1,22 @@
 // ============ backend/utils/mailer.js ============
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import "dotenv/config";
 
-const SMTP_PORT = Number(process.env.SMTP_PORT);
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: SMTP_PORT,
-  secure: SMTP_PORT === 465, // true for port 465 (SSL), false for 587 (STARTTLS)
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendMail({ to, subject, text }) {
   try {
-    const info = await transporter.sendMail({
-      from: '"CampusDesk" <no-reply@campusdesk.app>',
+    const { data, error } = await resend.emails.send({
+      from: "CampusDesk <onboarding@resend.dev>", // swap to your verified domain later
       to,
       subject,
       text,
     });
+    if (error) throw new Error(error.message || JSON.stringify(error));
     console.log(`Mail sent to ${to}: ${subject}`);
-    return info;
+    return data;
   } catch (err) {
-    console.error("SMTP ERROR:", err.message);
+    console.error("RESEND ERROR:", err.message);
     console.log(`[DEV MAIL FALLBACK] To: ${to} | Subject: ${subject} | ${text}`);
   }
 }
