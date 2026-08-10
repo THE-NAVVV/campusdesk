@@ -13,6 +13,17 @@ function generateOtp() {
   return String(Math.floor(100000 + Math.random() * 900000)); // 6-digit
 }
 
+// GET /api/auth/check-email?email=...
+// Tells the frontend whether this email is already registered,
+// so it knows whether to show the Name field before sending OTP.
+router.get("/check-email", (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ error: { message: "Email is required" } });
+
+  const existingUser = db.prepare(`SELECT id FROM users WHERE email = ?`).get(email);
+  res.json({ exists: !!existingUser });
+});
+
 // POST /api/auth/send-otp
 router.post("/send-otp", checkOtpRateLimit, async (req, res) => {
   const { email, name } = req.body;
