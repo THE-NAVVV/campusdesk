@@ -1,22 +1,35 @@
 // ============ backend/utils/mailer.js ============
-import { Resend } from "resend";
 import "dotenv/config";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
 export async function sendMail({ to, subject, text }) {
   try {
-    const { data, error } = await resend.emails.send({
-      from: "CampusDesk <onboarding@resend.dev>", // swap to your verified domain later
-      to,
-      subject,
-      text,
+    const res = await fetch(BREVO_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: { name: "CampusDesk", email: process.env.BREVO_SENDER_EMAIL },
+        to: [{ email: to }],
+        subject,
+        textContent: text,
+      }),
     });
-    if (error) throw new Error(error.message || JSON.stringify(error));
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(data?.message || `Brevo API error (status ${res.status})`);
+    }
+
     console.log(`Mail sent to ${to}: ${subject}`);
     return data;
   } catch (err) {
-    console.error("RESEND ERROR:", err.message);
+    console.error("BREVO ERROR:", err.message);
     console.log(`[DEV MAIL FALLBACK] To: ${to} | Subject: ${subject} | ${text}`);
   }
 }
