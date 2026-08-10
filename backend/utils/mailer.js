@@ -2,9 +2,12 @@
 import nodemailer from "nodemailer";
 import "dotenv/config";
 
+const SMTP_PORT = Number(process.env.SMTP_PORT);
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
+  port: SMTP_PORT,
+  secure: SMTP_PORT === 465, // true for port 465 (SSL), false for 587 (STARTTLS)
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -22,8 +25,7 @@ export async function sendMail({ to, subject, text }) {
     console.log(`Mail sent to ${to}: ${subject}`);
     return info;
   } catch (err) {
-    
-    console.error("SMTP ERROR:", err.message); 
+    console.error("SMTP ERROR:", err.message);
     console.log(`[DEV MAIL FALLBACK] To: ${to} | Subject: ${subject} | ${text}`);
   }
 }
