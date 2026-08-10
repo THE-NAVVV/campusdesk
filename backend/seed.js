@@ -1,19 +1,17 @@
 // ============ backend/seed.js ============
 import db from "./db.js";
 
-// Only clear + reseed the resources table.
-// Users, OTPs, and bookings are left untouched so real signups
-// and their bookings are never wiped by re-running this script.
+
 db.exec(`DELETE FROM resources;`);
 
-// Ensure at least one admin exists (won't touch existing users/admins)
+
 db.prepare(
   `INSERT OR IGNORE INTO users (name, email, role) VALUES (?, ?, 'admin')`
 ).run("Admin User", "admin@lnmiit.ac.in");
 
-// [name, description, location, category, openTime, closeTime]
+
 const resources = [
-  // ---- Lecture Theatres — Academic Building (LT1–LT10) ----
+  
   ...Array.from({ length: 10 }, (_, i) => [
     `LT ${i + 1}`,
     "Lecture theatre",

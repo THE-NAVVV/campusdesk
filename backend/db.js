@@ -1,7 +1,7 @@
 // ============ backend/db.js ============
 import Database from "better-sqlite3";
 
-// Use Railway persistent volume path if set, otherwise local file (for dev)
+
 const DB_PATH = process.env.DB_PATH || "campusdesk.db";
 
 const db = new Database(DB_PATH);
