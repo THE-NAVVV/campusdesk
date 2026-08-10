@@ -9,9 +9,11 @@ can never book the same resource for an overlapping time slot.**
 ## 1. Tech stack
 
 - **Backend:** Node.js + Express
-- **Database:** SQLite via `better-sqlite3` (synchronous driver, WAL mode)
+- **Database:** SQLite via `better-sqlite3` (synchronous driver, WAL mode),
+  persisted on a Railway volume so data survives restarts and redeploys
 - **Auth:** Email OTP (6-digit, 5 min expiry, single-use) → JWT (24h expiry, `{ id, role }`)
-- **Email:** Nodemailer, with a console-log dev fallback when SMTP creds are missing
+- **Email:** Brevo transactional email HTTP API, with a console-log dev
+  fallback when the request fails or credentials are missing
 - **Cron:** `node-cron`, runs every minute
 - **Frontend:** Vanilla HTML/CSS/JS (no framework), warm minimal theme, dark/light toggle
 
@@ -196,12 +198,88 @@ custom properties in `style.css`.
 
 ---
 
-## 6. Known limitations
+## 6. Email delivery: why Brevo, not raw SMTP
+
+The original implementation used `nodemailer` over SMTP (Gmail). It worked
+locally but failed in production on Railway with connection timeouts —
+Railway's free/hobby tier blocks outbound traffic on standard SMTP ports
+(25, 465, 587) as an anti-abuse measure, so the TCP handshake never
+completes regardless of how correct the host/port/credentials are.
+
+The fix was to switch to Brevo's transactional email **HTTP API**
+(`POST https://api.brevo.com/v3/smtp/email`), which travels over standard
+HTTPS (443) and isn't subject to the same port blocking. It also doesn't
+require a verified domain on the free tier — only a single verified sender
+email — which matters for a student project with no owned domain.
+
+`sendMail()` in `utils/mailer.js` never throws out of the request handler:
+if the Brevo call fails for any reason (bad key, rate limit, network blip),
+the error is logged and the OTP/reminder text is also printed to the
+console as a fallback, so a transient email failure never fully blocks
+login or booking flows — worst case, the user (or an admin checking logs)
+can still read the OTP from the Railway deploy log.
+
+---
+
+## 7. Auth flow: email-first, name only when needed
+
+Login is OTP-only, no passwords. The flow is intentionally split into three
+steps so returning users never have to re-enter their name:
+
+1. **`GET /api/auth/check-email?email=...`** — looks up the email in
+   `users` and returns `{ exists: boolean }`. This is a cheap, unauthenticated
+   read with no side effects.
+2. The frontend branches on that result:
+   - `exists: false` → show a "what's your name?" field, since this is the
+     one and only place a new user's name is ever collected.
+   - `exists: true` → skip straight to sending the OTP.
+3. **`POST /api/auth/verify-otp`** creates the `users` row (if it doesn't
+   already exist) using the name collected in step 2. If someone races this
+   flow and an account was created between steps 1 and 3 by another request,
+   the `find or create` logic in `verify-otp` still resolves correctly since
+   it re-checks by email rather than trusting the earlier `exists` result.
+
+This avoids the earlier UX problem where every login — first-time or
+returning — showed the same "Name (optional)" field with no indication of
+whether it was actually needed, which was confusing and, combined with the
+seeding issue below, made it look like accounts were being silently reset.
+
+---
+
+## 8. Seeding
+
+`seed.js` originally wiped and recreated `users`, `bookings`, and
+`resources` on every run — convenient for a fresh demo, but dangerous once
+real accounts exist: re-running it during later debugging deleted a real
+user's account and every booking tied to it, since `bookings.userId`
+references `users.id` and both tables were unconditionally cleared before
+being repopulated with a fixed set of test accounts.
+
+It now only touches `resources`:
+
+```js
+db.exec(`DELETE FROM resources;`);
+db.prepare(
+  `INSERT OR IGNORE INTO users (name, email, role) VALUES (?, ?, 'admin')`
+).run("Admin User", "admin@lnmiit.ac.in");
+```
+
+`users`, `otps`, and `bookings` are never touched, so `npm run seed` can be
+re-run at any time (e.g. to reset the resource catalog after a demo) without
+wiping real signups or their booking history. The admin insert uses
+`INSERT OR IGNORE`, so it's a no-op once an admin exists — there is
+currently exactly one seeded account, `admin@lnmiit.ac.in`. Every student
+account is created organically via the normal signup flow in §7.
+
+---
+
+## 9. Known limitations
 
 - Single SQLite file — fine for this assignment's scale and for a single
   Railway instance, but the concurrency guarantee described in §2 depends on
   staying single-process/single-connection.
-- Email delivery falls back to console logging when SMTP env vars aren't set
-  (useful for local dev/grading without configuring a real mailbox).
+- Email delivery depends on Brevo's free tier (300 emails/day); if that
+  quota is exhausted, sends fall back to console-only logging until it
+  resets.
 - No pagination on `GET /resources/:id/bookings` since it's scoped to a
   single day, which is bounded by nature.
