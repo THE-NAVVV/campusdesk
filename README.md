@@ -10,6 +10,7 @@ Built for the GDG LNMIIT Web Development Recruitment task.
 
 - **Frontend:** https://sunny-jelly-cb0b14.netlify.app/
 - **Backend API:** https://campusdesk-production.up.railway.app/api
+- **Video:** https://drive.google.com/file/d/14w0PGo2zqJj3t2ziu2WuBNJGdzSmY49J/view?usp=sharing
 
 ## ✨ Features
 
