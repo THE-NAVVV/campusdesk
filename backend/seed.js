@@ -1,20 +1,15 @@
 // ============ backend/seed.js ============
 import db from "./db.js";
 
-db.exec(`DELETE FROM bookings; DELETE FROM resources; DELETE FROM users; DELETE FROM otps;`);
+// Only clear + reseed the resources table.
+// Users, OTPs, and bookings are left untouched so real signups
+// and their bookings are never wiped by re-running this script.
+db.exec(`DELETE FROM resources;`);
 
-db.prepare(`INSERT INTO users (name, email, role) VALUES (?, ?, 'admin')`).run(
-  "Admin User",
-  "admin@lnmiit.ac.in"
-);
-db.prepare(`INSERT INTO users (name, email, role) VALUES (?, ?, 'student')`).run(
-  "Nav Singh",
-  "nav@lnmiit.ac.in"
-);
-db.prepare(`INSERT INTO users (name, email, role) VALUES (?, ?, 'student')`).run(
-  "Priya Sharma",
-  "priya@lnmiit.ac.in"
-);
+// Ensure at least one admin exists (won't touch existing users/admins)
+db.prepare(
+  `INSERT OR IGNORE INTO users (name, email, role) VALUES (?, ?, 'admin')`
+).run("Admin User", "admin@lnmiit.ac.in");
 
 // [name, description, location, category, openTime, closeTime]
 const resources = [
@@ -94,4 +89,4 @@ const insertResource = db.prepare(
 );
 resources.forEach((r) => insertResource.run(...r));
 
-console.log(`Seed complete: 1 admin, 2 students, ${resources.length} resources inserted.`);
+console.log(`Seed complete: resources reset, ${resources.length} resources inserted. Users and bookings were left untouched.`);
